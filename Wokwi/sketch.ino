@@ -60,15 +60,14 @@ const long motionHighTime = 5000;
 const long inhibitTime = 1200;
 
 void setup() {
-  // Start Serial Monitor
+  // Start Serial Monitor with defined baud rate in bits per second
   Serial.begin(115200);
 
-  // --- ADD YOUR GITHUB INFO HERE ---
   Serial.println("===================================");
-  Serial.println("Project by: aashish3808");
-  Serial.println("GitHub: https://github.com/aashish3808");
+  Serial.println("Project by: Group 14 IoT");
+  Serial.println("GitHub: https://github.com/snray24/EE960_AI_in_IOT_Group14");
   Serial.println("===================================");
-  Serial.println(""); // Add a blank line
+  Serial.println("");
 
   // Initialize LCD
   lcd.init();
@@ -117,33 +116,37 @@ void loop() {
 // --- Sensor Reading Functions ---
 
 void readTemperature() {
-  // 1. Send the command to get temperatures
+  // Send the command to get temperatures
   sensors.requestTemperatures(); 
   
-  // 2. Get the temperature in Celsius from the first sensor on the bus
+  // Get the temperature in Celsius from the first sensor on the bus
   temperatureC = sensors.getTempCByIndex(0);
 
-  // 3. Check if the reading is valid
+  // Check if the reading is valid
   if (temperatureC == DEVICE_DISCONNECTED_C) {
     Serial.println("Error: Could not read temperature");
-    temperatureC = 0.0; // Set to 0 if error
+    temperatureC = 0.0;
   }
 }
 
+
 void readDistance() {
-  // 1. Clear the TRIG_PIN
+  // Clear the TRIG_PIN to clear any previous signals
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
 
-  // 2. Set the TRIG_PIN high for 10 microseconds
+  // Set the TRIG_PIN high for 10 microseconds
   digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
 
-  // 3. Read the ECHO_PIN
+  // Measures the duration of the high pulse on the ECHO_PIN
+  // This duration corresponds to the time it took for the ultrasonic wave to travel to an object and return to the sensor
   duration = pulseIn(ECHO_PIN, HIGH);
 
-  // 4. Calculate the distance
+  // Calculate the distance in centimeters
+  // Duration is multiplied by the speed of sound (0.0343 cm/µs) 
+  // Divided by 2 (to account for the round trip)
   distanceCm = duration * 0.0343 / 2.0;
 }
 
@@ -168,8 +171,6 @@ void handlePIR() {
   }
 }
 
-// --- Display & Alert Functions ---
-
 void updateDisplays() {
   // --- Update Serial Monitor ---
   Serial.print("Temp: ");
@@ -183,7 +184,7 @@ void updateDisplays() {
   // Line 0: Temperature and Motion
   lcd.setCursor(0, 0);
   lcd.print("T:");
-  lcd.print(temperatureC, 1); // 1 decimal place
+  lcd.print(temperatureC, 1);
   lcd.print("C ");
 
   lcd.setCursor(9, 0);
@@ -193,7 +194,7 @@ void updateDisplays() {
   // Line 1: Distance
   lcd.setCursor(0, 1);
   lcd.print("Dist: ");
-  lcd.print(distanceCm, 1); // 1 decimal place
+  lcd.print(distanceCm, 1);
   lcd.print(" cm   "); 
 }
 
